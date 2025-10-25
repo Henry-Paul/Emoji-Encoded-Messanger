@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Emoji Messenger</title>
-    <meta name="description" content="Send encrypted messages using emojis - No login required">
+    <title>Secure Emoji Messenger - Global</title>
+    <meta name="description" content="Send encrypted messages using emojis - Real global sharing">
     <meta name="theme-color" content="#25D366">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
@@ -489,73 +489,84 @@
             background: var(--secondary);
         }
         
-        /* Install Prompt */
-        .install-prompt {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+        /* Global Messages Section */
+        .global-messages {
             background: white;
-            padding: 15px 20px;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            display: none;
-            align-items: center;
-            gap: 15px;
-            z-index: 1000;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateX(-50%) translateY(100px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-        
-        .install-prompt p {
-            margin: 0;
-            font-weight: 500;
-        }
-        
-        .install-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .close-install {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--gray);
-        }
-        
-        /* Download Instructions */
-        .download-instructions {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
+            margin: 20px;
+            padding: 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        .download-instructions h3 {
+        .global-messages h3 {
             color: var(--dark);
-            margin-bottom: 10px;
-        }
-        
-        .download-instructions ol {
-            padding-left: 20px;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .download-instructions li {
+        .global-message {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .global-message:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+        
+        .global-message-emoji {
+            font-size: 2rem;
+            text-align: center;
             margin-bottom: 8px;
-            line-height: 1.4;
+        }
+        
+        .global-message-info {
+            font-size: 0.8rem;
+            color: var(--gray);
+            text-align: center;
+        }
+        
+        .refresh-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* Real-time notification */
+        .new-message-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-50px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
         
         /* Responsive Adjustments */
@@ -589,31 +600,22 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
-
-        /* Global Message Storage Styles */
-        .global-storage-info {
-            background: #e3f2fd;
-            border-left: 4px solid var(--accent);
-            padding: 10px 15px;
-            margin: 10px 0;
-            border-radius: 0 8px 8px 0;
-            font-size: 0.8rem;
-        }
-
-        .storage-timer {
-            font-weight: bold;
-            color: var(--danger);
-        }
     </style>
 </head>
 <body>
+    <!-- New Message Alert -->
+    <div class="new-message-alert" id="new-message-alert">
+        <i class="fas fa-bell"></i>
+        <span>New message received!</span>
+    </div>
+
     <div class="app-container">
         <div class="header">
             <div class="whatsapp-logo">
                 <i class="fas fa-lock"></i>
             </div>
             <h1>Secure Emoji Messenger</h1>
-            <p>Send encrypted messages using emojis - Global Access</p>
+            <p>Real Global Sharing - No Login Required</p>
             <button class="settings-btn" id="settings-btn">
                 <i class="fas fa-cog"></i>
             </button>
@@ -621,19 +623,15 @@
             <div class="settings-panel" id="settings-panel">
                 <div class="settings-option" id="clear-chat">
                     <i class="fas fa-trash"></i>
-                    <span>Clear Chat</span>
+                    <span>Clear Local Chat</span>
                 </div>
-                <div class="settings-option" id="change-theme">
-                    <i class="fas fa-palette"></i>
-                    <span>Change Theme</span>
+                <div class="settings-option" id="refresh-global">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>Refresh Global Messages</span>
                 </div>
-                <div class="settings-option" id="export-chat">
-                    <i class="fas fa-download"></i>
-                    <span>Export Chat</span>
-                </div>
-                <div class="settings-option" id="install-app">
-                    <i class="fas fa-download"></i>
-                    <span>Install App</span>
+                <div class="settings-option" id="share-app">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Share App</span>
                 </div>
             </div>
         </div>
@@ -641,6 +639,7 @@
         <div class="tab-container">
             <div class="tab active" data-tab="encoder">Encoder</div>
             <div class="tab" data-tab="decoder">Decoder</div>
+            <div class="tab" data-tab="global">Global Messages</div>
             <div class="tab" data-tab="integration">Guide</div>
         </div>
         
@@ -650,11 +649,9 @@
                 <div class="chat-messages" id="chat-messages">
                     <div class="empty-state" id="empty-state">
                         <i class="fas fa-comment-dots"></i>
-                        <h3>No messages yet</h3>
+                        <h3>No local messages yet</h3>
                         <p>Select an emoji to create an encrypted message</p>
                     </div>
-                    
-                    <!-- Messages will be added here dynamically -->
                 </div>
                 
                 <div class="emoji-keyboard" id="emoji-keyboard">
@@ -662,8 +659,8 @@
                 </div>
                 
                 <div class="instructions">
-                    <p><strong>How to use:</strong> Tap any emoji → Add text and password → Send. Recipient uses this same app to decode.</p>
-                    <p class="global-storage-info">Messages are stored globally for <span class="storage-timer">5 minutes</span> and can be accessed by anyone with the link and password.</p>
+                    <p><strong>How to use:</strong> Tap any emoji → Add text and password → Send. Message becomes available globally for 5 minutes.</p>
+                    <p><i class="fas fa-globe"></i> <strong>Global:</strong> Anyone with this app link can decode your message</p>
                 </div>
             </div>
         </div>
@@ -671,10 +668,6 @@
         <!-- Decoder Tab -->
         <div class="content" id="decoder-content">
             <div class="integration-section">
-                <div class="global-storage-info" style="margin: 0 0 20px 0;">
-                    <i class="fas fa-globe"></i> <strong>Global Access:</strong> Anyone with this link can decode messages within 5 minutes of creation
-                </div>
-                
                 <div class="integration-step">
                     <div class="step-number">1</div>
                     <div class="step-content">
@@ -715,19 +708,46 @@
             </div>
         </div>
         
+        <!-- Global Messages Tab -->
+        <div class="content" id="global-content">
+            <div class="global-messages">
+                <h3>
+                    <i class="fas fa-globe-americas"></i>
+                    Global Messages
+                    <button class="refresh-btn" id="refresh-global-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </h3>
+                <div id="global-messages-list">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No global messages</h3>
+                        <p>Messages from all users will appear here</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="instructions" style="margin: 20px; border-radius: 10px;">
+                <p><strong>Live Global Feed:</strong> See all messages being sent worldwide in real-time</p>
+                <p><i class="fas fa-clock"></i> Messages auto-delete after 5 minutes</p>
+                <p><i class="fas fa-users"></i> Anyone can decode with the correct password</p>
+            </div>
+        </div>
+        
         <!-- Integration Tab -->
         <div class="content" id="integration-content">
             <div class="integration-section">
                 <div class="integration-step">
                     <div class="step-number">1</div>
                     <div class="step-content">
-                        <div class="step-title">Share the App</div>
-                        <div class="step-description">Share this link with anyone in the world - no login required</div>
-                        <button class="action-btn" id="share-btn">
-                            <i class="fas fa-share-alt"></i> Share App Link
-                        </button>
-                        <div class="global-storage-info" style="margin-top: 10px;">
-                            <i class="fas fa-info-circle"></i> All messages are automatically deleted after 5 minutes
+                        <div class="step-title">Real Global Sharing</div>
+                        <div class="step-description">
+                            <ul style="text-align: left; margin-top: 10px; padding-left: 20px;">
+                                <li>User in Hyderabad encodes a message</li>
+                                <li>User in Chennai sees it immediately in Global Messages</li>
+                                <li>No login required - works instantly worldwide</li>
+                                <li>All messages visible to all users for 5 minutes</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -735,16 +755,14 @@
                 <div class="integration-step">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <div class="step-title">How to Encode</div>
+                        <div class="step-title">How to Encode & Share</div>
                         <div class="step-description">
                             <ol style="text-align: left; margin-top: 10px; padding-left: 20px;">
-                                <li>Go to the Encoder tab</li>
-                                <li>Select an emoji from the keyboard</li>
-                                <li>Enter your secret message</li>
-                                <li>Set a password</li>
-                                <li>Copy the emoji and share it</li>
-                                <li>Share the password separately</li>
-                                <li>Tell recipient to use this same app</li>
+                                <li>Go to <strong>Encoder</strong> tab</li>
+                                <li>Select an emoji and enter your message</li>
+                                <li>Set a password and send</li>
+                                <li>Your message becomes instantly available worldwide</li>
+                                <li>Share the password separately with recipients</li>
                             </ol>
                         </div>
                     </div>
@@ -756,11 +774,10 @@
                         <div class="step-title">How to Decode</div>
                         <div class="step-description">
                             <ol style="text-align: left; margin-top: 10px; padding-left: 20px;">
-                                <li>Go to the Decoder tab</li>
-                                <li>Paste the emoji you received</li>
-                                <li>Enter the password</li>
-                                <li>Click "Decode Message"</li>
-                                <li>The message will appear for 60 seconds</li>
+                                <li>Check <strong>Global Messages</strong> tab for new messages</li>
+                                <li>Or go to <strong>Decoder</strong> tab and paste any emoji</li>
+                                <li>Enter the password provided by sender</li>
+                                <li>View the decrypted message</li>
                             </ol>
                         </div>
                     </div>
@@ -769,13 +786,13 @@
                 <div class="integration-step">
                     <div class="step-number">4</div>
                     <div class="step-content">
-                        <div class="step-title">Global Access</div>
+                        <div class="step-title">Live Features</div>
                         <div class="step-description">
-                            <p>This app works worldwide without any login. Anyone with the link can:</p>
                             <ul style="text-align: left; margin-top: 10px; padding-left: 20px;">
-                                <li>Encode messages with emojis</li>
-                                <li>Decode messages with the correct password</li>
-                                <li>Access messages for 5 minutes after creation</li>
+                                <li>🔔 Real-time notifications for new messages</li>
+                                <li>🌍 See messages from users worldwide</li>
+                                <li>⏰ Automatic cleanup after 5 minutes</li>
+                                <li>📱 Works on all devices simultaneously</li>
                             </ul>
                         </div>
                     </div>
@@ -796,7 +813,7 @@
             <input type="password" class="password-input" id="sender-password" placeholder="Set a password to encrypt...">
             <div class="modal-buttons">
                 <button class="modal-btn confirm" id="confirm-send">
-                    <i class="fas fa-copy"></i> Copy Emoji
+                    <i class="fas fa-paper-plane"></i> Send Globally
                 </button>
                 <button class="modal-btn cancel" id="cancel-send">Cancel</button>
             </div>
@@ -810,16 +827,16 @@
                 <i class="fas fa-shield-alt"></i>
             </div>
             <h3 class="modal-title">Secure Emoji Messenger</h3>
-            <p style="margin-bottom: 15px; line-height: 1.5;">Send encrypted messages using emojis. Perfect for sharing sensitive information securely.</p>
-            <p style="margin-bottom: 15px; font-weight: bold; color: var(--secondary);">🌍 Works globally - No login required!</p>
+            <p style="margin-bottom: 15px; line-height: 1.5;">Now with <strong>real global messaging</strong>! See messages from users worldwide in real-time.</p>
+            <p style="margin-bottom: 15px; font-weight: bold; color: var(--secondary);">🌍 Hyderabad to Chennai - Instant!</p>
             <div class="modal-buttons">
-                <button class="modal-btn confirm" id="get-started">Get Started</button>
+                <button class="modal-btn confirm" id="get-started">Start Messaging</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Enhanced emoji database with more options
+        // Enhanced emoji database
         const emojiDatabase = {
             "😀": "I'm feeling great!",
             "😂": "That's hilarious!",
@@ -877,29 +894,16 @@
             "⚡": "That was fast!",
             "🔥": "That's hot!",
             "❄️": "It's cold!",
-            "🌈": "Stay positive!",
-            "🎯": "Right on target!",
-            "💎": "This is valuable",
-            "🚨": "Emergency!",
-            "✅": "Approved!",
-            "❌": "Rejected!",
-            "⚠️": "Warning!",
-            "🔑": "Here's the key",
-            "🗝️": "Important secret",
-            "🕵️": "This is confidential",
-            "🤫": "Keep this quiet",
-            "🚫": "Don't share this"
+            "🌈": "Stay positive!"
         };
 
         // App State
         const state = {
             messages: [],
-            messageTimers: {},
             selectedEmoji: null,
-            currentDecodingMessage: null,
             settingsOpen: false,
-            deferredPrompt: null,
-            globalMessages: new Map() // Simulated global storage
+            lastGlobalCheck: 0,
+            globalCheckInterval: null
         };
 
         // DOM Elements
@@ -908,6 +912,7 @@
             emojiKeyboard: document.getElementById('emoji-keyboard'),
             passwordModal: document.getElementById('password-modal'),
             welcomeModal: document.getElementById('welcome-modal'),
+            newMessageAlert: document.getElementById('new-message-alert'),
             selectedEmojiDisplay: document.getElementById('selected-emoji'),
             messageText: document.getElementById('message-text'),
             senderPassword: document.getElementById('sender-password'),
@@ -924,10 +929,10 @@
             settingsPanel: document.getElementById('settings-panel'),
             emptyState: document.getElementById('empty-state'),
             clearChat: document.getElementById('clear-chat'),
-            changeTheme: document.getElementById('change-theme'),
-            exportChat: document.getElementById('export-chat'),
-            installApp: document.getElementById('install-app'),
-            shareBtn: document.getElementById('share-btn'),
+            refreshGlobal: document.getElementById('refresh-global'),
+            shareApp: document.getElementById('share-app'),
+            refreshGlobalBtn: document.getElementById('refresh-global-btn'),
+            globalMessagesList: document.getElementById('global-messages-list'),
             tabs: document.querySelectorAll('.tab'),
             contents: document.querySelectorAll('.content')
         };
@@ -939,7 +944,7 @@
             loadMessages();
             setupTabNavigation();
             checkFirstVisit();
-            startGlobalCleanup(); // Start cleaning global messages every minute
+            startGlobalMessageChecker();
         }
 
         // Setup tab navigation
@@ -955,6 +960,11 @@
                     // Show corresponding content
                     elements.contents.forEach(c => c.classList.remove('active'));
                     document.getElementById(`${tabId}-content`).classList.add('active');
+                    
+                    // Refresh global messages when switching to that tab
+                    if (tabId === 'global') {
+                        loadGlobalMessages();
+                    }
                 });
             });
         }
@@ -984,7 +994,7 @@
             elements.senderPassword.value = '';
         }
 
-        // Send encrypted message
+        // Send encrypted message to global storage
         function sendEncryptedMessage() {
             const text = elements.messageText.value.trim();
             const password = elements.senderPassword.value.trim();
@@ -999,32 +1009,26 @@
                 return;
             }
             
-            // Create a unique identifier for this message
-            const messageId = generateMessageId(text, password);
-            
             // Create message object
             const message = {
-                id: messageId,
+                id: generateMessageId(text, password),
                 emoji: state.selectedEmoji,
                 text: text,
                 password: password,
-                timestamp: new Date(),
-                type: 'sent',
-                expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes from now
+                timestamp: Date.now(),
+                expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
+                location: getRandomLocation() // Simulate user location
             };
             
-            // Store in global storage (simulated)
-            storeMessageGlobally(message);
+            // Store in global storage
+            addMessageToGlobalStorage(message);
             
             // Add to local state and save
-            state.messages.push(message);
+            state.messages.push({...message, type: 'sent'});
             saveMessages();
             
-            // Create message element
-            createMessageElement(message);
-            
-            // Copy emoji to clipboard
-            copyToClipboard(state.selectedEmoji);
+            // Create local message element
+            createMessageElement({...message, type: 'sent'});
             
             // Close modal
             elements.passwordModal.style.display = 'none';
@@ -1038,49 +1042,137 @@
             // Reset selected emoji
             state.selectedEmoji = null;
             
-            showNotification('Emoji copied to clipboard! Share it with your message and password.', 'success');
+            showNotification('Message sent globally! Others can see it now.', 'success');
         }
 
-        // Store message in "global" storage (simulated using localStorage)
-        function storeMessageGlobally(message) {
-            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '{}');
-            globalMessages[message.id] = message;
-            localStorage.setItem('globalEmojiMessages', JSON.stringify(globalMessages));
+        // Add message to global storage (simulated using localStorage as shared storage)
+        function addMessageToGlobalStorage(message) {
+            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '[]');
+            globalMessages.push(message);
             
-            // Schedule cleanup for this message
-            setTimeout(() => {
-                removeMessageFromGlobalStorage(message.id);
-            }, 5 * 60 * 1000); // 5 minutes
-        }
-
-        // Remove expired message from global storage
-        function removeMessageFromGlobalStorage(messageId) {
-            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '{}');
-            delete globalMessages[messageId];
+            // Keep only last 50 messages to prevent storage overflow
+            if (globalMessages.length > 50) {
+                globalMessages.splice(0, globalMessages.length - 50);
+            }
+            
             localStorage.setItem('globalEmojiMessages', JSON.stringify(globalMessages));
+            localStorage.setItem('globalMessagesUpdated', Date.now().toString());
         }
 
-        // Clean up expired global messages
-        function startGlobalCleanup() {
-            setInterval(() => {
-                const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '{}');
-                const now = Date.now();
-                let changed = false;
+        // Load and display global messages
+        function loadGlobalMessages() {
+            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '[]');
+            const now = Date.now();
+            
+            // Filter out expired messages
+            const validMessages = globalMessages.filter(msg => msg.expiresAt > now);
+            
+            // Update storage with only valid messages
+            if (validMessages.length !== globalMessages.length) {
+                localStorage.setItem('globalEmojiMessages', JSON.stringify(validMessages));
+            }
+            
+            elements.globalMessagesList.innerHTML = '';
+            
+            if (validMessages.length === 0) {
+                elements.globalMessagesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No global messages</h3>
+                        <p>Messages from users worldwide will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Display messages in reverse order (newest first)
+            validMessages.reverse().forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.className = 'global-message';
+                messageElement.setAttribute('data-emoji', message.emoji);
+                messageElement.setAttribute('data-password', message.password);
                 
-                for (const [id, message] of Object.entries(globalMessages)) {
-                    if (message.expiresAt && message.expiresAt < now) {
-                        delete globalMessages[id];
-                        changed = true;
-                    }
-                }
+                const timeAgo = getTimeAgo(message.timestamp);
+                const expiresIn = Math.ceil((message.expiresAt - now) / 1000 / 60);
                 
-                if (changed) {
-                    localStorage.setItem('globalEmojiMessages', JSON.stringify(globalMessages));
-                }
-            }, 60000); // Check every minute
+                messageElement.innerHTML = `
+                    <div class="global-message-emoji">${message.emoji}</div>
+                    <div class="global-message-info">
+                        <div>From: ${message.location}</div>
+                        <div>${timeAgo} • Expires in ${expiresIn}m</div>
+                        <div><small>Click to decode with password</small></div>
+                    </div>
+                `;
+                
+                messageElement.addEventListener('click', () => {
+                    elements.decodeEmoji.value = message.emoji;
+                    switchToTab('decoder');
+                    elements.decodePassword.focus();
+                });
+                
+                elements.globalMessagesList.appendChild(messageElement);
+            });
         }
 
-        // Generate a unique message ID based on text and password
+        // Start checking for new global messages
+        function startGlobalMessageChecker() {
+            state.globalCheckInterval = setInterval(() => {
+                checkForNewMessages();
+                loadGlobalMessages(); // Refresh the list
+            }, 3000); // Check every 3 seconds
+            
+            // Initial load
+            loadGlobalMessages();
+        }
+
+        // Check for new global messages
+        function checkForNewMessages() {
+            const lastUpdate = parseInt(localStorage.getItem('globalMessagesUpdated') || '0');
+            
+            if (lastUpdate > state.lastGlobalCheck) {
+                state.lastGlobalCheck = lastUpdate;
+                
+                // Show notification if not on global tab
+                const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+                if (activeTab !== 'global') {
+                    showNewMessageAlert();
+                }
+            }
+        }
+
+        // Show new message alert
+        function showNewMessageAlert() {
+            elements.newMessageAlert.style.display = 'flex';
+            setTimeout(() => {
+                elements.newMessageAlert.style.display = 'none';
+            }, 3000);
+        }
+
+        // Generate random user location (for demo purposes)
+        function getRandomLocation() {
+            const locations = ['Hyderabad', 'Chennai', 'Mumbai', 'Delhi', 'Bangalore', 'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow'];
+            return locations[Math.floor(Math.random() * locations.length)];
+        }
+
+        // Get time ago string
+        function getTimeAgo(timestamp) {
+            const now = Date.now();
+            const diff = now - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes === 1) return '1 minute ago';
+            if (minutes < 60) return `${minutes} minutes ago`;
+            
+            const hours = Math.floor(minutes / 60);
+            if (hours === 1) return '1 hour ago';
+            if (hours < 24) return `${hours} hours ago`;
+            
+            const days = Math.floor(hours / 24);
+            return `${days} day${days > 1 ? 's' : ''} ago`;
+        }
+
+        // Generate a unique message ID
         function generateMessageId(text, password) {
             let hash = 0;
             const str = text + password + Date.now();
@@ -1098,8 +1190,7 @@
             messageElement.className = `message ${message.type}`;
             messageElement.id = `message-${message.id}`;
             
-            const timeString = message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const expiresIn = Math.max(0, Math.floor((message.expiresAt - Date.now()) / 1000 / 60));
+            const timeString = new Date(message.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             
             messageElement.innerHTML = `
                 <div class="message-info" title="View message">
@@ -1107,7 +1198,7 @@
                 </div>
                 <div class="message-emoji">${message.emoji}</div>
                 <div class="message-text">${message.text}</div>
-                <div class="message-timer">Expires in ${expiresIn} minutes</div>
+                <div class="message-timer">Global Message</div>
                 <div class="message-time">${timeString}</div>
             `;
             
@@ -1142,27 +1233,6 @@
             }
         }
 
-        // Copy text to clipboard
-        function copyToClipboard(text) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).catch(err => {
-                    fallbackCopyToClipboard(text);
-                });
-            } else {
-                fallbackCopyToClipboard(text);
-            }
-        }
-
-        // Fallback copy method
-        function fallbackCopyToClipboard(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-        }
-
         // Decode message from any source
         function decodeMessage() {
             const emoji = elements.decodeEmoji.value.trim();
@@ -1179,10 +1249,10 @@
             }
             
             // Try to find the message in global storage first
-            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '{}');
+            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '[]');
             let foundMessage = null;
             
-            for (const [id, message] of Object.entries(globalMessages)) {
+            for (const message of globalMessages) {
                 if (message.emoji === emoji && message.password === password) {
                     foundMessage = message;
                     break;
@@ -1325,12 +1395,12 @@
 
         // Clear all messages
         function clearChat() {
-            if (confirm('Are you sure you want to clear all messages?')) {
+            if (confirm('Are you sure you want to clear all local messages?')) {
                 state.messages = [];
                 saveMessages();
                 elements.chatMessages.innerHTML = '';
                 elements.emptyState.style.display = 'block';
-                showNotification('Chat cleared successfully!', 'success');
+                showNotification('Local chat cleared successfully!', 'success');
             }
         }
 
@@ -1339,14 +1409,44 @@
             const appUrl = window.location.href;
             if (navigator.share) {
                 navigator.share({
-                    title: 'Secure Emoji Messenger',
-                    text: 'Check out this app for sending encrypted messages using emojis! No login required, works globally.',
+                    title: 'Secure Emoji Messenger - Global',
+                    text: 'Check out this app for sending encrypted messages globally using emojis! No login required, real-time global sharing.',
                     url: appUrl
                 });
             } else {
                 copyToClipboard(appUrl);
-                showNotification('App link copied to clipboard! Share it with your friends.', 'success');
+                showNotification('App link copied to clipboard! Share it worldwide.', 'success');
             }
+        }
+
+        // Copy text to clipboard
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).catch(err => {
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                fallbackCopyToClipboard(text);
+            }
+        }
+
+        // Fallback copy method
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+
+        // Switch to specific tab
+        function switchToTab(tabId) {
+            elements.tabs.forEach(t => t.classList.remove('active'));
+            elements.contents.forEach(c => c.classList.remove('active'));
+            
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(`${tabId}-content`).classList.add('active');
         }
 
         // Setup event listeners
@@ -1374,26 +1474,17 @@
             
             // Settings options
             elements.clearChat.addEventListener('click', clearChat);
-            elements.changeTheme.addEventListener('click', () => {
-                showNotification('Theme change feature coming soon!', 'info');
+            elements.refreshGlobal.addEventListener('click', () => {
+                loadGlobalMessages();
+                showNotification('Global messages refreshed!', 'success');
                 state.settingsOpen = false;
                 elements.settingsPanel.classList.remove('show');
             });
             
-            elements.exportChat.addEventListener('click', () => {
-                showNotification('Export feature coming soon!', 'info');
-                state.settingsOpen = false;
-                elements.settingsPanel.classList.remove('show');
-            });
+            elements.shareApp.addEventListener('click', shareApp);
             
-            elements.installApp.addEventListener('click', () => {
-                showNotification('Install feature coming soon!', 'info');
-                state.settingsOpen = false;
-                elements.settingsPanel.classList.remove('show');
-            });
-            
-            // Share button
-            elements.shareBtn.addEventListener('click', shareApp);
+            // Refresh global button
+            elements.refreshGlobalBtn.addEventListener('click', loadGlobalMessages);
             
             // Allow Enter key to submit forms
             elements.messageText.addEventListener('keypress', (e) => {

@@ -156,12 +156,14 @@ function showPasswordModal() {
     elements.senderPassword.value = '';
 }
 
-// Send encrypted message to global storage
+// Send encrypted message to global storage - FIXED FUNCTION
 function sendEncryptedMessage() {
+    console.log("Send Globally button clicked!"); // Debug log
+    
     const text = elements.messageText.value.trim();
     const password = elements.senderPassword.value.trim();
     
-    console.log('Sending message:', { text, password, emoji: state.selectedEmoji }); // Debug log
+    console.log("Text:", text, "Password:", password); // Debug log
     
     if (!text) {
         showNotification('Please enter a message.', 'error');
@@ -183,6 +185,8 @@ function sendEncryptedMessage() {
         expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes
         location: getRandomLocation() // Simulate user location
     };
+    
+    console.log("Message created:", message); // Debug log
     
     // Store in global storage
     addMessageToGlobalStorage(message);
@@ -221,6 +225,8 @@ function addMessageToGlobalStorage(message) {
     
     localStorage.setItem('globalEmojiMessages', JSON.stringify(globalMessages));
     localStorage.setItem('globalMessagesUpdated', Date.now().toString());
+    
+    console.log("Message added to global storage. Total messages:", globalMessages.length); // Debug log
 }
 
 // Load and display global messages
@@ -272,6 +278,7 @@ function loadGlobalMessages() {
             elements.decodeEmoji.value = message.emoji;
             switchToTab('decoder');
             elements.decodePassword.focus();
+            showNotification('Emoji auto-filled! Enter password to decode.', 'info');
         });
         
         elements.globalMessagesList.appendChild(messageElement);
@@ -613,81 +620,105 @@ function switchToTab(tabId) {
     document.getElementById(`${tabId}-content`).classList.add('active');
 }
 
-// Setup event listeners
+// Setup event listeners - FIXED EVENT LISTENERS
 function setupEventListeners() {
-    // Password modal - FIXED: Added proper event listeners
-    elements.confirmSend.addEventListener('click', sendEncryptedMessage);
-    elements.cancelSend.addEventListener('click', () => {
+    console.log("Setting up event listeners..."); // Debug log
+    
+    // Password modal - FIXED: Proper event binding
+    elements.confirmSend.addEventListener('click', function(event) {
+        console.log("Confirm Send button clicked!"); // Debug log
+        event.preventDefault();
+        sendEncryptedMessage();
+    });
+    
+    elements.cancelSend.addEventListener('click', function(event) {
+        event.preventDefault();
         elements.passwordModal.style.display = 'none';
         state.selectedEmoji = null;
     });
     
     // Decode button
-    elements.decodeBtn.addEventListener('click', decodeMessage);
+    elements.decodeBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+        decodeMessage();
+    });
     
     // Welcome modal
-    elements.getStarted.addEventListener('click', () => {
+    elements.getStarted.addEventListener('click', function(event) {
+        event.preventDefault();
         elements.welcomeModal.style.display = 'none';
     });
     
     // Settings
-    elements.settingsBtn.addEventListener('click', () => {
+    elements.settingsBtn.addEventListener('click', function(event) {
+        event.preventDefault();
         state.settingsOpen = !state.settingsOpen;
         elements.settingsPanel.classList.toggle('show', state.settingsOpen);
     });
     
     // Settings options
-    elements.clearChat.addEventListener('click', clearChat);
-    elements.refreshGlobal.addEventListener('click', () => {
+    elements.clearChat.addEventListener('click', function(event) {
+        event.preventDefault();
+        clearChat();
+        state.settingsOpen = false;
+        elements.settingsPanel.classList.remove('show');
+    });
+    
+    elements.refreshGlobal.addEventListener('click', function(event) {
+        event.preventDefault();
         loadGlobalMessages();
         showNotification('Global messages refreshed!', 'success');
         state.settingsOpen = false;
         elements.settingsPanel.classList.remove('show');
     });
     
-    elements.shareApp.addEventListener('click', shareApp);
+    elements.shareApp.addEventListener('click', function(event) {
+        event.preventDefault();
+        shareApp();
+        state.settingsOpen = false;
+        elements.settingsPanel.classList.remove('show');
+    });
     
     // Refresh global button
-    elements.refreshGlobalBtn.addEventListener('click', loadGlobalMessages);
+    elements.refreshGlobalBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+        loadGlobalMessages();
+    });
     
-    // Allow Enter key to submit forms - FIXED: Added proper key listeners
-    elements.messageText.addEventListener('keypress', (e) => {
+    // Allow Enter key to submit forms
+    elements.messageText.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
+            e.preventDefault();
             elements.senderPassword.focus();
         }
     });
     
-    elements.senderPassword.addEventListener('keypress', (e) => {
+    elements.senderPassword.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
+            e.preventDefault();
             sendEncryptedMessage();
         }
     });
     
-    elements.decodePassword.addEventListener('keypress', (e) => {
+    elements.decodePassword.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
+            e.preventDefault();
             decodeMessage();
         }
     });
     
     // Close settings when clicking outside
-    document.addEventListener('click', (e) => {
+    document.addEventListener('click', function(e) {
         if (!elements.settingsBtn.contains(e.target) && !elements.settingsPanel.contains(e.target)) {
             state.settingsOpen = false;
             elements.settingsPanel.classList.remove('show');
         }
     });
     
-    // FIXED: Close modal when clicking outside modal content
-    elements.passwordModal.addEventListener('click', (e) => {
-        if (e.target === elements.passwordModal) {
-            elements.passwordModal.style.display = 'none';
-            state.selectedEmoji = null;
-        }
-    });
-    
-    elements.welcomeModal.addEventListener('click', (e) => {
-        if (e.target === elements.welcomeModal) {
-            elements.welcomeModal.style.display = 'none';
+    // Close modals when clicking outside
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
         }
     });
 }

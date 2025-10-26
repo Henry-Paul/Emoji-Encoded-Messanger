@@ -1,7 +1,7 @@
 {
-    "name": "Secure Emoji Messenger - Global",
-    "short_name": "Global Emoji Messenger",
-    "description": "Send encrypted messages using emojis - Real global sharing",
+    "name": "Secure Emoji Messenger",
+    "short_name": "Emoji Messenger",
+    "description": "Send encrypted messages using emojis - Global Access",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#128C7E",

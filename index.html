@@ -3,29 +3,565 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Emoji Messenger - Global</title>
-    <meta name="description" content="Send encrypted messages using emojis - Real global sharing">
+    <title>Secure Emoji Messenger</title>
+    <meta name="description" content="Send encrypted messages using emojis - Global Access">
     <meta name="theme-color" content="#25D366">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #25D366;
+            --secondary: #128C7E;
+            --accent: #34B7F1;
+            --light: #f0f0f0;
+            --dark: #075E54;
+            --success: #25D366;
+            --danger: #dc3545;
+            --gray: #667781;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            height: 90vh;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .whatsapp-logo {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .settings-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Tab Styles */
+        .tab-container {
+            display: flex;
+            background-color: var(--secondary);
+            padding: 0 15px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            color: white;
+            cursor: pointer;
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            border-bottom: 3px solid white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Content Areas */
+        .content {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .content.active {
+            display: flex;
+        }
+        
+        /* Chat Area Styles */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: var(--light);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 12px 15px;
+            border-radius: 18px;
+            position: relative;
+            word-break: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.sent {
+            align-self: flex-end;
+            background-color: var(--primary);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message.received {
+            align-self: flex-start;
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message-emoji {
+            font-size: 2.5rem;
+            text-align: center;
+            margin: 5px 0;
+        }
+        
+        .message-info {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        
+        .message-info:hover {
+            transform: scale(1.1);
+        }
+        
+        .message.received .message-info {
+            left: -8px;
+            right: auto;
+        }
+        
+        .message-text {
+            font-size: 0.9rem;
+            margin-top: 8px;
+            padding: 8px 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: none;
+            animation: textReveal 0.5s ease;
+        }
+        
+        @keyframes textReveal {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .message-timer {
+            font-size: 0.7rem;
+            margin-top: 5px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--danger);
+            display: none;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .message.received .message-time {
+            text-align: left;
+        }
+        
+        /* Emoji Keyboard Styles */
+        .emoji-keyboard {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #e0e0e0;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+        
+        .emoji-btn {
+            font-size: 1.8rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 10px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .emoji-btn:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.1);
+        }
+        
+        /* Instructions */
+        .instructions {
+            padding: 12px 15px;
+            background-color: #dcf8c6;
+            border-top: 1px solid #a0a0a0;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--dark);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 350px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .modal-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+        
+        .text-input, .password-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            margin-bottom: 15px;
+        }
+        
+        .text-input:focus, .password-input:focus {
+            border-color: var(--secondary);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .modal-btn.confirm {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .modal-btn.confirm:hover {
+            background-color: var(--dark);
+        }
+        
+        .modal-btn.cancel {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .modal-btn.cancel:hover {
+            background-color: #d0d0d0;
+        }
+        
+        /* Settings Panel */
+        .settings-panel {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            padding: 15px;
+            width: 200px;
+            z-index: 100;
+        }
+        
+        .settings-panel.show {
+            display: block;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        .settings-option {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+        
+        .settings-option:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-option i {
+            width: 20px;
+            color: var(--secondary);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+        
+        /* WhatsApp Integration Section */
+        .integration-section {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .integration-step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            background: var(--secondary);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .step-description {
+            font-size: 0.9rem;
+            color: var(--gray);
+            line-height: 1.4;
+        }
+        
+        .action-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        
+        .action-btn:hover {
+            background: var(--secondary);
+        }
+        
+        /* Global Message Storage Styles */
+        .global-storage-info {
+            background: #e3f2fd;
+            border-left: 4px solid var(--accent);
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.8rem;
+        }
+
+        .storage-timer {
+            font-weight: bold;
+            color: var(--danger);
+        }
+
+        /* Auto-refresh indicator */
+        .auto-refresh {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 480px) {
+            .app-container {
+                height: 100vh;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            
+            .emoji-keyboard {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
 </head>
 <body>
-    <!-- New Message Alert -->
-    <div class="new-message-alert" id="new-message-alert">
-        <i class="fas fa-bell"></i>
-        <span>New message received!</span>
-    </div>
-
     <div class="app-container">
         <div class="header">
             <div class="whatsapp-logo">
                 <i class="fas fa-lock"></i>
             </div>
             <h1>Secure Emoji Messenger</h1>
-            <p>Real Global Sharing - No Login Required</p>
+            <p>Send encrypted messages using emojis - Global Access</p>
             <button class="settings-btn" id="settings-btn">
                 <i class="fas fa-cog"></i>
             </button>
@@ -33,15 +569,19 @@
             <div class="settings-panel" id="settings-panel">
                 <div class="settings-option" id="clear-chat">
                     <i class="fas fa-trash"></i>
-                    <span>Clear Local Chat</span>
+                    <span>Clear Chat</span>
                 </div>
-                <div class="settings-option" id="refresh-global">
-                    <i class="fas fa-sync-alt"></i>
-                    <span>Refresh Global Messages</span>
+                <div class="settings-option" id="change-theme">
+                    <i class="fas fa-palette"></i>
+                    <span>Change Theme</span>
                 </div>
-                <div class="settings-option" id="share-app">
-                    <i class="fas fa-share-alt"></i>
-                    <span>Share App</span>
+                <div class="settings-option" id="export-chat">
+                    <i class="fas fa-download"></i>
+                    <span>Export Chat</span>
+                </div>
+                <div class="settings-option" id="install-app">
+                    <i class="fas fa-download"></i>
+                    <span>Install App</span>
                 </div>
             </div>
         </div>
@@ -49,7 +589,6 @@
         <div class="tab-container">
             <div class="tab active" data-tab="encoder">Encoder</div>
             <div class="tab" data-tab="decoder">Decoder</div>
-            <div class="tab" data-tab="global">Global Messages</div>
             <div class="tab" data-tab="integration">Guide</div>
         </div>
         
@@ -59,9 +598,11 @@
                 <div class="chat-messages" id="chat-messages">
                     <div class="empty-state" id="empty-state">
                         <i class="fas fa-comment-dots"></i>
-                        <h3>No local messages yet</h3>
+                        <h3>No messages yet</h3>
                         <p>Select an emoji to create an encrypted message</p>
                     </div>
+                    
+                    <!-- Messages will be added here dynamically -->
                 </div>
                 
                 <div class="emoji-keyboard" id="emoji-keyboard">
@@ -69,8 +610,11 @@
                 </div>
                 
                 <div class="instructions">
-                    <p><strong>How to use:</strong> Tap any emoji → Add text and password → Send. Message becomes available globally for 5 minutes.</p>
-                    <p><i class="fas fa-globe"></i> <strong>Global:</strong> Anyone with this app link can decode your message</p>
+                    <p><strong>How to use:</strong> Tap any emoji → Add text and password → Send. Recipient uses this same app to decode.</p>
+                    <p class="global-storage-info">
+                        <span class="auto-refresh"></span>
+                        <strong>Live Updates:</strong> Messages are stored globally for <span class="storage-timer">5 minutes</span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -78,6 +622,11 @@
         <!-- Decoder Tab -->
         <div class="content" id="decoder-content">
             <div class="integration-section">
+                <div class="global-storage-info">
+                    <span class="auto-refresh"></span>
+                    <strong>Global Access:</strong> Anyone with this link can decode messages within 5 minutes of creation
+                </div>
+                
                 <div class="integration-step">
                     <div class="step-number">1</div>
                     <div class="step-content">
@@ -118,46 +667,20 @@
             </div>
         </div>
         
-        <!-- Global Messages Tab -->
-        <div class="content" id="global-content">
-            <div class="global-messages">
-                <h3>
-                    <i class="fas fa-globe-americas"></i>
-                    Global Messages
-                    <button class="refresh-btn" id="refresh-global-btn">
-                        <i class="fas fa-sync-alt"></i> Refresh
-                    </button>
-                </h3>
-                <div id="global-messages-list">
-                    <div class="empty-state">
-                        <i class="fas fa-inbox"></i>
-                        <h3>No global messages</h3>
-                        <p>Messages from all users will appear here</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="instructions" style="margin: 20px; border-radius: 10px;">
-                <p><strong>Live Global Feed:</strong> See all messages being sent worldwide in real-time</p>
-                <p><i class="fas fa-clock"></i> Messages auto-delete after 5 minutes</p>
-                <p><i class="fas fa-users"></i> Anyone can decode with the correct password</p>
-            </div>
-        </div>
-        
         <!-- Integration Tab -->
         <div class="content" id="integration-content">
             <div class="integration-section">
                 <div class="integration-step">
                     <div class="step-number">1</div>
                     <div class="step-content">
-                        <div class="step-title">Real Global Sharing</div>
-                        <div class="step-description">
-                            <ul style="text-align: left; margin-top: 10px; padding-left: 20px;">
-                                <li>User in Hyderabad encodes a message</li>
-                                <li>User in Chennai sees it immediately in Global Messages</li>
-                                <li>No login required - works instantly worldwide</li>
-                                <li>All messages visible to all users for 5 minutes</li>
-                            </ul>
+                        <div class="step-title">Share the App</div>
+                        <div class="step-description">Share this link with anyone in the world - no login required</div>
+                        <button class="action-btn" id="share-btn">
+                            <i class="fas fa-share-alt"></i> Share App Link
+                        </button>
+                        <div class="global-storage-info" style="margin-top: 10px;">
+                            <span class="auto-refresh"></span>
+                            All messages are automatically deleted after 5 minutes
                         </div>
                     </div>
                 </div>
@@ -165,14 +688,16 @@
                 <div class="integration-step">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <div class="step-title">How to Encode & Share</div>
+                        <div class="step-title">How to Encode</div>
                         <div class="step-description">
                             <ol style="text-align: left; margin-top: 10px; padding-left: 20px;">
-                                <li>Go to <strong>Encoder</strong> tab</li>
-                                <li>Select an emoji and enter your message</li>
-                                <li>Set a password and send</li>
-                                <li>Your message becomes instantly available worldwide</li>
-                                <li>Share the password separately with recipients</li>
+                                <li>Go to the Encoder tab</li>
+                                <li>Select an emoji from the keyboard</li>
+                                <li>Enter your secret message</li>
+                                <li>Set a password</li>
+                                <li>Copy the emoji and share it</li>
+                                <li>Share the password separately</li>
+                                <li>Tell recipient to use this same app</li>
                             </ol>
                         </div>
                     </div>
@@ -184,11 +709,27 @@
                         <div class="step-title">How to Decode</div>
                         <div class="step-description">
                             <ol style="text-align: left; margin-top: 10px; padding-left: 20px;">
-                                <li>Check <strong>Global Messages</strong> tab for new messages</li>
-                                <li>Or go to <strong>Decoder</strong> tab and paste any emoji</li>
-                                <li>Enter the password provided by sender</li>
-                                <li>View the decrypted message</li>
+                                <li>Go to the Decoder tab</li>
+                                <li>Paste the emoji you received</li>
+                                <li>Enter the password</li>
+                                <li>Click "Decode Message"</li>
+                                <li>The message will appear for 60 seconds</li>
                             </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="integration-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Global Access</div>
+                        <div class="step-description">
+                            <p>This app works worldwide without any login. Anyone with the link can:</p>
+                            <ul style="text-align: left; margin-top: 10px; padding-left: 20px;">
+                                <li>Encode messages with emojis</li>
+                                <li>Decode messages with the correct password</li>
+                                <li>Access messages for 5 minutes after creation</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -208,7 +749,7 @@
             <input type="password" class="password-input" id="sender-password" placeholder="Set a password to encrypt...">
             <div class="modal-buttons">
                 <button class="modal-btn confirm" id="confirm-send">
-                    <i class="fas fa-paper-plane"></i> Send Globally
+                    <i class="fas fa-copy"></i> Copy Emoji
                 </button>
                 <button class="modal-btn cancel" id="cancel-send">Cancel</button>
             </div>
@@ -222,14 +763,701 @@
                 <i class="fas fa-shield-alt"></i>
             </div>
             <h3 class="modal-title">Secure Emoji Messenger</h3>
-            <p style="margin-bottom: 15px; line-height: 1.5;">Now with <strong>real global messaging</strong>! See messages from users worldwide in real-time.</p>
-            <p style="margin-bottom: 15px; font-weight: bold; color: var(--secondary);">🌍 Hyderabad to Chennai - Instant!</p>
+            <p style="margin-bottom: 15px; line-height: 1.5;">Send encrypted messages using emojis. Perfect for sharing sensitive information securely.</p>
+            <p style="margin-bottom: 15px; font-weight: bold; color: var(--secondary);">🌍 Works globally - No login required!</p>
             <div class="modal-buttons">
-                <button class="modal-btn confirm" id="get-started">Start Messaging</button>
+                <button class="modal-btn confirm" id="get-started">Get Started</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Enhanced emoji database with more options
+        const emojiDatabase = {
+            "😀": "I'm feeling great!",
+            "😂": "That's hilarious!",
+            "🥰": "Sending love your way!",
+            "😎": "Cool and confident!",
+            "🤔": "I'm thinking about it...",
+            "🙄": "Seriously?",
+            "😍": "I love it!",
+            "🤩": "That's amazing!",
+            "😊": "I'm happy!",
+            "😇": "Have a good day!",
+            "🥺": "Please?",
+            "❤️": "I love you!",
+            "🤗": "Sending hugs!",
+            "😴": "I'm tired",
+            "😭": "I'm really sad",
+            "😡": "I'm angry",
+            "🤢": "That's disgusting",
+            "🥳": "Let's celebrate!",
+            "🎉": "Congratulations!",
+            "🎂": "Happy birthday!",
+            "🍕": "I'm hungry for pizza",
+            "☕": "Need coffee!",
+            "🚀": "Let's do this!",
+            "💡": "I have an idea!",
+            "⭐": "You're a star!",
+            "🏆": "You're a winner!",
+            "🙏": "Thank you!",
+            "👍": "Good job!",
+            "👎": "Not good",
+            "👋": "Hello!",
+            "🤝": "Let's work together",
+            "💪": "You can do it!",
+            "🎵": "I love this song!",
+            "📚": "Time to study",
+            "💼": "Busy with work",
+            "🏖️": "Wish I was on vacation",
+            "🎮": "Let's play games!",
+            "🎬": "Movie night?",
+            "🛒": "Time to go shopping",
+            "💰": "Money matters",
+            "🔒": "This is confidential",
+            "🎁": "I have a gift for you",
+            "💌": "Sending you a message",
+            "📞": "Call me!",
+            "✈️": "Let's travel!",
+            "🏠": "I'm at home",
+            "🌧️": "It's raining here",
+            "🌞": "Beautiful day!",
+            "🌙": "Good night!",
+            "🐶": "I love dogs!",
+            "🐱": "I love cats!",
+            "🌻": "Thinking of you",
+            "🍀": "Good luck!",
+            "⚡": "That was fast!",
+            "🔥": "That's hot!",
+            "❄️": "It's cold!",
+            "🌈": "Stay positive!",
+            "🎯": "Right on target!",
+            "💎": "This is valuable",
+            "🚨": "Emergency!",
+            "✅": "Approved!",
+            "❌": "Rejected!",
+            "⚠️": "Warning!",
+            "🔑": "Here's the key",
+            "🗝️": "Important secret",
+            "🕵️": "This is confidential",
+            "🤫": "Keep this quiet",
+            "🚫": "Don't share this"
+        };
+
+        // App State
+        const state = {
+            messages: [],
+            messageTimers: {},
+            selectedEmoji: null,
+            currentDecodingMessage: null,
+            settingsOpen: false,
+            deferredPrompt: null,
+            refreshInterval: null
+        };
+
+        // DOM Elements
+        const elements = {
+            chatMessages: document.getElementById('chat-messages'),
+            emojiKeyboard: document.getElementById('emoji-keyboard'),
+            passwordModal: document.getElementById('password-modal'),
+            welcomeModal: document.getElementById('welcome-modal'),
+            selectedEmojiDisplay: document.getElementById('selected-emoji'),
+            messageText: document.getElementById('message-text'),
+            senderPassword: document.getElementById('sender-password'),
+            decodeEmoji: document.getElementById('decode-emoji'),
+            decodePassword: document.getElementById('decode-password'),
+            decodeBtn: document.getElementById('decode-btn'),
+            decodeResult: document.getElementById('decode-result'),
+            decodedMessageText: document.getElementById('decoded-message-text'),
+            decodeTimer: document.getElementById('decode-timer'),
+            confirmSend: document.getElementById('confirm-send'),
+            cancelSend: document.getElementById('cancel-send'),
+            getStarted: document.getElementById('get-started'),
+            settingsBtn: document.getElementById('settings-btn'),
+            settingsPanel: document.getElementById('settings-panel'),
+            emptyState: document.getElementById('empty-state'),
+            clearChat: document.getElementById('clear-chat'),
+            changeTheme: document.getElementById('change-theme'),
+            exportChat: document.getElementById('export-chat'),
+            installApp: document.getElementById('install-app'),
+            shareBtn: document.getElementById('share-btn'),
+            tabs: document.querySelectorAll('.tab'),
+            contents: document.querySelectorAll('.content')
+        };
+
+        // Initialize the application
+        function init() {
+            populateEmojiKeyboard();
+            setupEventListeners();
+            loadMessages();
+            setupTabNavigation();
+            checkFirstVisit();
+            startGlobalRefresh(); // Start checking for new global messages
+        }
+
+        // Setup tab navigation
+        function setupTabNavigation() {
+            elements.tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    elements.tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show corresponding content
+                    elements.contents.forEach(c => c.classList.remove('active'));
+                    document.getElementById(`${tabId}-content`).classList.add('active');
+                });
+            });
+        }
+
+        // Populate emoji keyboard
+        function populateEmojiKeyboard() {
+            const emojis = Object.keys(emojiDatabase);
+            elements.emojiKeyboard.innerHTML = ''; // Clear existing
+            emojis.forEach(emoji => {
+                const emojiBtn = document.createElement('button');
+                emojiBtn.className = 'emoji-btn';
+                emojiBtn.textContent = emoji;
+                emojiBtn.setAttribute('title', emojiDatabase[emoji]);
+                emojiBtn.addEventListener('click', () => {
+                    state.selectedEmoji = emoji;
+                    showPasswordModal();
+                });
+                elements.emojiKeyboard.appendChild(emojiBtn);
+            });
+        }
+
+        // Show password modal for sender
+        function showPasswordModal() {
+            elements.selectedEmojiDisplay.textContent = state.selectedEmoji;
+            elements.messageText.value = emojiDatabase[state.selectedEmoji];
+            elements.passwordModal.style.display = 'flex';
+            elements.messageText.focus();
+            elements.senderPassword.value = '';
+        }
+
+        // Send encrypted message
+        function sendEncryptedMessage() {
+            const text = elements.messageText.value.trim();
+            const password = elements.senderPassword.value.trim();
+            
+            if (!text) {
+                showNotification('Please enter a message.', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showNotification('Please enter a password to encrypt your message.', 'error');
+                return;
+            }
+            
+            // Create a unique identifier for this message
+            const messageId = generateMessageId(text, password);
+            
+            // Create message object
+            const message = {
+                id: messageId,
+                emoji: state.selectedEmoji,
+                text: text,
+                password: password,
+                timestamp: new Date(),
+                type: 'sent',
+                expiresAt: Date.now() + 5 * 60 * 1000 // 5 minutes from now
+            };
+            
+            // Store in global storage
+            storeMessageGlobally(message);
+            
+            // Add to local state and save
+            state.messages.push(message);
+            saveMessages();
+            
+            // Create message element
+            createMessageElement(message);
+            
+            // Copy emoji to clipboard
+            copyToClipboard(state.selectedEmoji);
+            
+            // Close modal
+            elements.passwordModal.style.display = 'none';
+            
+            // Hide empty state
+            elements.emptyState.style.display = 'none';
+            
+            // Scroll to bottom
+            scrollToBottom();
+            
+            // Reset selected emoji
+            state.selectedEmoji = null;
+            
+            showNotification('Emoji copied to clipboard! Share it with your message and password.', 'success');
+        }
+
+        // Store message in global storage (simulated using localStorage)
+        function storeMessageGlobally(message) {
+            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '{}');
+            globalMessages[message.id] = {
+                ...message,
+                globalId: generateGlobalId(),
+                createdAt: Date.now()
+            };
+            localStorage.setItem('globalEmojiMessages', JSON.stringify(globalMessages));
+            
+            // Schedule cleanup for this message
+            setTimeout(() => {
+                removeMessageFromGlobalStorage(message.id);
+            }, 5 * 60 * 1000); // 5 minutes
+        }
+
+        // Generate a global ID for tracking
+        function generateGlobalId() {
+            return 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Remove expired message from global storage
+        function removeMessageFromGlobalStorage(messageId) {
+            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '{}');
+            delete globalMessages[messageId];
+            localStorage.setItem('globalEmojiMessages', JSON.stringify(globalMessages));
+        }
+
+        // Start global refresh to check for new messages
+        function startGlobalRefresh() {
+            // Check every 3 seconds for new messages
+            state.refreshInterval = setInterval(() => {
+                checkForNewGlobalMessages();
+            }, 3000);
+        }
+
+        // Check for new global messages and update UI
+        function checkForNewGlobalMessages() {
+            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '{}');
+            let hasNewMessages = false;
+            
+            // Check if we have any new messages that we haven't displayed
+            Object.values(globalMessages).forEach(globalMsg => {
+                if (!state.messages.some(msg => msg.id === globalMsg.id)) {
+                    // This is a new global message
+                    const message = {
+                        ...globalMsg,
+                        type: 'received',
+                        timestamp: new Date(globalMsg.timestamp || globalMsg.createdAt)
+                    };
+                    
+                    state.messages.push(message);
+                    createMessageElement(message);
+                    hasNewMessages = true;
+                }
+            });
+            
+            if (hasNewMessages) {
+                saveMessages();
+                if (state.messages.length > 0) {
+                    elements.emptyState.style.display = 'none';
+                }
+                scrollToBottom();
+            }
+            
+            // Clean up expired messages from our local state
+            const now = Date.now();
+            state.messages = state.messages.filter(msg => {
+                if (msg.expiresAt && msg.expiresAt < now) {
+                    // Remove from DOM
+                    const messageElement = document.getElementById(`message-${msg.id}`);
+                    if (messageElement) {
+                        messageElement.remove();
+                    }
+                    return false;
+                }
+                return true;
+            });
+            
+            if (state.messages.length === 0) {
+                elements.emptyState.style.display = 'block';
+            }
+        }
+
+        // Generate a unique message ID based on text and password
+        function generateMessageId(text, password) {
+            let hash = 0;
+            const str = text + password + Date.now();
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString();
+        }
+
+        // Create message element in DOM
+        function createMessageElement(message) {
+            // Check if element already exists
+            if (document.getElementById(`message-${message.id}`)) {
+                return;
+            }
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${message.type}`;
+            messageElement.id = `message-${message.id}`;
+            
+            const timeString = message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const expiresIn = Math.max(0, Math.floor((message.expiresAt - Date.now()) / 1000 / 60));
+            
+            messageElement.innerHTML = `
+                <div class="message-info" title="View message">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <div class="message-emoji">${message.emoji}</div>
+                <div class="message-text">${message.text}</div>
+                <div class="message-timer">Expires in ${expiresIn} minutes</div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            elements.chatMessages.appendChild(messageElement);
+            
+            // Add click event to info button
+            const infoBtn = messageElement.querySelector('.message-info');
+            infoBtn.addEventListener('click', () => {
+                showMessageText(messageElement, message);
+            });
+            
+            return messageElement;
+        }
+
+        // Show message text with password
+        function showMessageText(messageElement, message) {
+            const password = prompt('Enter password to view this message:');
+            if (password === message.password) {
+                const messageText = messageElement.querySelector('.message-text');
+                const messageTimer = messageElement.querySelector('.message-timer');
+                
+                messageText.style.display = 'block';
+                messageTimer.style.display = 'block';
+                
+                // Hide message after 60 seconds
+                setTimeout(() => {
+                    messageText.style.display = 'none';
+                    messageTimer.style.display = 'none';
+                }, 60000);
+            } else {
+                showNotification('Incorrect password!', 'error');
+            }
+        }
+
+        // Copy text to clipboard
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).catch(err => {
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                fallbackCopyToClipboard(text);
+            }
+        }
+
+        // Fallback copy method
+        function fallbackCopyToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+        }
+
+        // Decode message from any source
+        function decodeMessage() {
+            const emoji = elements.decodeEmoji.value.trim();
+            const password = elements.decodePassword.value.trim();
+            
+            if (!emoji) {
+                showNotification('Please paste an emoji.', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showNotification('Please enter the password.', 'error');
+                return;
+            }
+            
+            // Try to find the message in global storage first
+            const globalMessages = JSON.parse(localStorage.getItem('globalEmojiMessages') || '{}');
+            let foundMessage = null;
+            
+            // Search through global messages
+            for (const [id, globalMsg] of Object.entries(globalMessages)) {
+                if (globalMsg.emoji === emoji && globalMsg.password === password) {
+                    foundMessage = globalMsg;
+                    break;
+                }
+            }
+            
+            // If not found in global storage, try local storage
+            if (!foundMessage) {
+                for (const message of state.messages) {
+                    if (message.emoji === emoji && message.password === password) {
+                        foundMessage = message;
+                        break;
+                    }
+                }
+            }
+            
+            // If still not found, try default messages
+            if (!foundMessage && emojiDatabase[emoji]) {
+                if (password === "default" || password === "") {
+                    foundMessage = {
+                        emoji: emoji,
+                        text: emojiDatabase[emoji],
+                        password: password
+                    };
+                }
+            }
+            
+            if (foundMessage) {
+                elements.decodedMessageText.textContent = foundMessage.text;
+                elements.decodeResult.style.display = 'flex';
+                startDecodeTimer();
+                showNotification('Message decoded successfully!', 'success');
+                
+                // Save to local messages if not already there and if it's a real message
+                if (foundMessage.id && !state.messages.some(m => m.id === foundMessage.id)) {
+                    state.messages.push({
+                        ...foundMessage,
+                        timestamp: new Date(),
+                        type: 'received'
+                    });
+                    saveMessages();
+                }
+                
+                // Clear input fields after successful decode
+                elements.decodeEmoji.value = '';
+                elements.decodePassword.value = '';
+            } else {
+                showNotification('No matching message found. Check the emoji and password.', 'error');
+            }
+        }
+
+        // Start countdown timer for decoded message
+        function startDecodeTimer() {
+            let secondsLeft = 60;
+            elements.decodeTimer.textContent = `Message will disappear in ${secondsLeft} seconds`;
+            elements.decodeTimer.style.display = 'block';
+            
+            const timer = setInterval(() => {
+                secondsLeft--;
+                elements.decodeTimer.textContent = `Message will disappear in ${secondsLeft} seconds`;
+                
+                if (secondsLeft <= 0) {
+                    clearInterval(timer);
+                    elements.decodeResult.style.display = 'none';
+                    elements.decodeTimer.style.display = 'none';
+                }
+            }, 1000);
+        }
+
+        // Check if this is the first visit
+        function checkFirstVisit() {
+            const hasVisited = localStorage.getItem('hasVisited');
+            if (!hasVisited) {
+                elements.welcomeModal.style.display = 'flex';
+                localStorage.setItem('hasVisited', 'true');
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            // Remove any existing notifications
+            document.querySelectorAll('.notification').forEach(notification => {
+                notification.remove();
+            });
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 2000;
+                animation: slideInRight 0.3s ease;
+                max-width: 300px;
+            `;
+            
+            if (type === 'success') {
+                notification.style.backgroundColor = 'var(--success)';
+            } else if (type === 'error') {
+                notification.style.backgroundColor = 'var(--danger)';
+            } else {
+                notification.style.backgroundColor = 'var(--primary)';
+            }
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOutRight 0.3s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 3000);
+        }
+
+        // Scroll to bottom of chat
+        function scrollToBottom() {
+            setTimeout(() => {
+                elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+            }, 100);
+        }
+
+        // Save messages to localStorage
+        function saveMessages() {
+            localStorage.setItem('secureEmojiMessages', JSON.stringify(state.messages));
+        }
+
+        // Load messages from localStorage
+        function loadMessages() {
+            const savedMessages = localStorage.getItem('secureEmojiMessages');
+            if (savedMessages) {
+                state.messages = JSON.parse(savedMessages);
+                
+                state.messages.forEach(message => {
+                    createMessageElement(message);
+                });
+                
+                if (state.messages.length > 0) {
+                    elements.emptyState.style.display = 'none';
+                }
+                
+                scrollToBottom();
+            }
+        }
+
+        // Clear all messages
+        function clearChat() {
+            if (confirm('Are you sure you want to clear all messages?')) {
+                state.messages = [];
+                saveMessages();
+                elements.chatMessages.innerHTML = '';
+                elements.emptyState.style.display = 'block';
+                showNotification('Chat cleared successfully!', 'success');
+            }
+        }
+
+        // Share app link
+        function shareApp() {
+            const appUrl = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Secure Emoji Messenger',
+                    text: 'Check out this app for sending encrypted messages using emojis! No login required, works globally.',
+                    url: appUrl
+                });
+            } else {
+                copyToClipboard(appUrl);
+                showNotification('App link copied to clipboard! Share it with your friends.', 'success');
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Password modal
+            elements.confirmSend.addEventListener('click', sendEncryptedMessage);
+            elements.cancelSend.addEventListener('click', () => {
+                elements.passwordModal.style.display = 'none';
+                state.selectedEmoji = null;
+            });
+            
+            // Decode button
+            elements.decodeBtn.addEventListener('click', decodeMessage);
+            
+            // Welcome modal
+            elements.getStarted.addEventListener('click', () => {
+                elements.welcomeModal.style.display = 'none';
+            });
+            
+            // Settings
+            elements.settingsBtn.addEventListener('click', () => {
+                state.settingsOpen = !state.settingsOpen;
+                elements.settingsPanel.classList.toggle('show', state.settingsOpen);
+            });
+            
+            // Settings options
+            elements.clearChat.addEventListener('click', clearChat);
+            elements.changeTheme.addEventListener('click', () => {
+                showNotification('Theme change feature coming soon!', 'info');
+                state.settingsOpen = false;
+                elements.settingsPanel.classList.remove('show');
+            });
+            
+            elements.exportChat.addEventListener('click', () => {
+                showNotification('Export feature coming soon!', 'info');
+                state.settingsOpen = false;
+                elements.settingsPanel.classList.remove('show');
+            });
+            
+            elements.installApp.addEventListener('click', () => {
+                showNotification('Install feature coming soon!', 'info');
+                state.settingsOpen = false;
+                elements.settingsPanel.classList.remove('show');
+            });
+            
+            // Share button
+            elements.shareBtn.addEventListener('click', shareApp);
+            
+            // Allow Enter key to submit forms
+            elements.messageText.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    elements.senderPassword.focus();
+                }
+            });
+            
+            elements.senderPassword.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendEncryptedMessage();
+                }
+            });
+            
+            elements.decodePassword.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    decodeMessage();
+                }
+            });
+            
+            // Close settings when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!elements.settingsBtn.contains(e.target) && !elements.settingsPanel.contains(e.target)) {
+                    state.settingsOpen = false;
+                    elements.settingsPanel.classList.remove('show');
+                }
+            });
+        }
+
+        // Add CSS for notifications animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOutRight {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
